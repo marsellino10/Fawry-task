@@ -1,1 +1,18 @@
-temp
+1. How Arguments Are Handled by the Script
+ Step 1: Looks for --help, which displays directions.
+ Reads the flags (-n, -v, -vn) in step two:
+ Line numbers are displayed.
+ -v → Displays mismatched lines.
+ Step 3: Uses the filename and search term.
+ Step 4: Looks for mistakes (missing word or file).
+=========================================================
+ 2. Adding More Features (Like Regex or -i/-c/-l)
+To add:
+ Regex: Change == to =~ in matching.
+ -i (case-sensitive): Remove ,, lowercase conversion.
+ -c (count matches): Add a counter, print total at the end.
+ -l (show filenames only): Print filename instead of lines.
+============================================================
+ 3. Hardest Part to Implement
+Inverting the match (-v flag):
+Because Bash doesn’t have simple "true/false" flipping.

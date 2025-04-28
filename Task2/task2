@@ -1,0 +1,76 @@
+First requirment: Check DNS Resolution
+
+# Check using system DNS
+dig internal.example.com
+
+# Check using Google's DNS
+dig @8.8.8.8 internal.example.com
+
+=====================================================
+
+Second requirment: Check if the Service is Reachable
+
+# Try to connect to port 80 (HTTP)
+telnet internal.example.com 80
+
+# Try to connect to port 443 (HTTPS)
+telnet internal.example.com 443
+
+# Check HTTP response
+curl -v http://internal.example.com
+
+# Check HTTPS response
+curl -v https://internal.example.com
+
+# See if the server is listening on ports 80 or 443
+sudo netstat -tuln | grep ':80\|:443'
+
+# Or using ss command
+sudo ss -tuln | grep ':80\|:443'
+========================================================
+
+Third requirment: Trace the Issue – List All Possible Causes
+1-DNS server is wrong or not working
+2-DNS record is wrong or missing
+3-Firewall is blocking the connection
+4-Service is only listening on localhost (127.0.0.1)
+5-Network routing is broken
+6-Wrong settings in /etc/hosts file
+7-SSL/TLS certificate is expired (for HTTPS)
+
+=========================================================
+
+Fourth requirment: How to Confirm the Root Cause and Fix Each Problem
+
+1-DNS server not working
+How to confirm: Run the dig command using both your system DNS and a known working DNS like 8.8.8.8. If the results differ, it’s likely a DNS issue.
+How to fix: Update your /etc/resolv.conf with a working DNS server like 8.8.8.8 or your internal DNS server.
+sudo nano /etc/resolv.conf
+
+2-Wrong DNS record
+How to confirm: Use dig or nslookup to check if the DNS record for internal.example.com resolves to the correct IP. If it doesn't, there’s likely an issue with the DNS record itself.
+How to fix: If the DNS record is wrong, fix it on your DNS server or contact your DNS administrator.
+
+3-Firewall blocking the connection
+How to confirm: If you can't reach the service on port 80 or 443 (use telnet or nc to test), the firewall may be blocking the ports. If you can reach the service from other networks or systems, the issue may be local.
+How to fix: Open the required ports in the firewall to allow traffic.
+sudo ufw allow 80,443/tcp
+
+4-Service only on localhost
+How to confirm: Check if the service is bound only to 127.0.0.1 using netstat or ss. If the service is not bound to the server's public IP, this is likely the problem.
+How to fix: Modify the service configuration to bind to 0.0.0.0 or the server's public IP address.
+
+5-Routing problem
+How to confirm: Use traceroute to check if the network routing is working properly. If the trace fails at any hop, there may be a routing issue.
+How to fix: Adjust the routing settings on your network equipment or servers.
+traceroute internal.example.com
+
+6-Incorrect /etc/hosts entry
+How to confirm: If the DNS lookup doesn't work but the service is reachable by IP address, it could be due to a wrong /etc/hosts entry. Check if there is an incorrect entry for internal.example.com.
+How to fix: Edit the /etc/hosts file to remove or fix the wrong entry.
+sudo nano /etc/hosts
+
+7-Expired certificate
+How to confirm: Use curl -v to check the SSL certificate. If the certificate is expired, the response will indicate the issue.
+How to fix: Renew the SSL certificate for the domain.
+curl -v https://internal.example.com
